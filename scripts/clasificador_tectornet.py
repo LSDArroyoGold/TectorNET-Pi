@@ -1,5 +1,5 @@
 """Clasificacion sobre un evento ya delimitado por AcumuladorEventos
-(detector.py, reusado tal cual de birdnet-lsd -- es agnostico al modelo).
+(detector.py, reusado tal cual de TectorNET-Pi -- es agnostico al modelo).
 
 Arquitectura TectorNet, decidida y validada el 28/08/2026 tras descartar
 BirdNET reentrenado (sobre-disparaba: etiquetaba cualquier cosa como
@@ -99,7 +99,7 @@ def _normalizar_pico(audio, pico=0.25):
 
 class ClasificadorTectorNet:
     """Interfaz deliberadamente compatible con Clasificador (clasificador.py
-    de birdnet-lsd) en los metodos que usa motor.py: .confidence,
+    de TectorNET-Pi) en los metodos que usa motor.py: .confidence,
     .analizar_ventanas_todas(audio, paso_s), .decidir_confianza_racha(
     ventanas, incluir_diagnostico), .nombre_comun_de(label). No hace
     falta ningun cambio en motor.py mas alla de importar esta clase en
@@ -350,7 +350,7 @@ class ClasificadorTectorNet:
     # ------------------------------------------------------------------
     def decidir_confianza_racha(self, ventanas, incluir_diagnostico=False):
         """Copia funcional de Clasificador.decidir_confianza_racha
-        (clasificador.py de birdnet-lsd): rachas de ventanas consecutivas
+        (clasificador.py de TectorNET-Pi): rachas de ventanas consecutivas
         ganadas por la misma clase, promedio ponderado por posicion
         dentro de la racha, compara la mejor racha de cada especie recien
         al final contra CONFIDENCE. Unico agregado: la confirmacion
@@ -467,7 +467,7 @@ def cargar_config_tectornet(path):
     reusa tal cual, sin tocar), pero agrega las claves nuevas de
     TectorNet (ESCALA) que ese modulo no conoce. SENSITIVITY sigue
     presente en config_deteccion.txt por compatibilidad de formato con
-    birdnet-lsd, pero ClasificadorTectorNet no la usa (era especifica del
+    TectorNET-Pi, pero ClasificadorTectorNet no la usa (era especifica del
     escalado de BirdNET/Clasificador original) -- se ignora."""
     import configparser
     parser = configparser.ConfigParser()
@@ -483,7 +483,7 @@ def cargar_config_tectornet(path):
         # con pruebas propias que el sistema anda igual con este paso,
         # y reduce a la mitad el numero de ventanas que Perch2 tiene que
         # escanear por evento (impacto directo en el tiempo de
-        # clasificacion, ver actualizar_birdnet_lsd.sh/README para el
+        # clasificacion, ver actualizar_tectornet_pi.sh/README para el
         # contexto completo de por que esto importaba).
         "PASO_VENTANA_S": c.getfloat("PASO_VENTANA_S", fallback=2.0),
     }

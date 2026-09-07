@@ -1,19 +1,19 @@
 #!/bin/bash
 #
-# actualizar_birdnet_lsd.sh - Actualiza el checkout de birdnet-lsd ya
+# actualizar_tectornet_pi.sh - Actualiza el checkout de TectorNET-Pi ya
 # migrado (git pull) y reinicia el servicio si hubo cambios, pensado
 # para correr en cada ventana (amanecer/atardecer) de un dispositivo en
 # el campo sin acceso SSH mientras corre.
 #
-# Por que existe: migrar_a_birdnet_lsd.sh (el clone + instalacion inicial)
-# solo corre mientras no exista /home/lsd/.birdnet_lsd_migrado -- una vez
+# Por que existe: migrar_a_tectornet_pi.sh (el clone + instalacion inicial)
+# solo corre mientras no exista /home/lsd/.tectornet_pi_migrado -- una vez
 # migrado, ese bloque entero se salta para siempre en inicio_amanecer.sh/
 # inicio_atardecer.sh, y con el se salteaba tambien cualquier chance de
 # bajar cambios nuevos. Encontrado el 26/08: dos fixes reales (CONFIDENCE
 # 0.6->0.5, formato de hora en el nombre de archivo) quedaron pusheados
 # en GitHub sin ninguna forma de llegar a tector1.
 #
-# Mismo principio rector que migrar_a_birdnet_lsd.sh: NUNCA dejar al
+# Mismo principio rector que migrar_a_tectornet_pi.sh: NUNCA dejar al
 # dispositivo sin motor de deteccion sano. Si el pull trae un cambio que
 # rompe el servicio (no queda activo, o arecord no arranca, o el
 # clasificador no clasifica), se revierte solo al commit anterior (que ya
@@ -28,11 +28,15 @@
 # esta version en adelante, cada actualizacion futura si pasa por el
 # re-exec correctamente. Este comentario es, de hecho, el primer cambio
 # real usado para confirmarlo end-to-end en tector1.
+#
+# 7/9/2026: script (y repo) renombrado de birdnet-lsd a TectorNET-Pi --
+# ver migrar_a_tectornet_pi.sh para el mecanismo que renombra en el lugar
+# una instalacion vieja ya corriendo bajo el nombre anterior.
 
 set -uo pipefail
 
-BIRDNET_LSD_DIR="/home/lsd/birdnet-lsd"
-MARCA_MIGRADO="/home/lsd/.birdnet_lsd_migrado"
+TECTORNET_PI_DIR="/home/lsd/TectorNET-Pi"
+MARCA_MIGRADO="/home/lsd/.tectornet_pi_migrado"
 
 log() {
 	# Arreglado el 29/08/2026: log_sistema.py real (/home/lsd/log_sistema.py)
@@ -54,7 +58,7 @@ log() {
 	# BUG REAL encontrado el 4/9/2026 en tector2: el comentario de arriba
 	# decia la verdad a MEDIAS -- "log_sistema.txt" existe en DOS lugares
 	# distintos segun el dispositivo, porque este script es de un repo
-	# hermano (birdnet-lsd) compartido tal cual entre los dos:
+	# hermano (TectorNET-Pi) compartido tal cual entre los dos:
 	#   - tector2 (LSD-Tector2.0): anidado, /home/lsd/LSD-Tector2.0/log_sistema.txt
 	#   - tector1 (LSD-Tector1.1): plano, /home/lsd/log_sistema.txt directo
 	# El fix del 29/08 escribia a la ruta plana -- resulta que esa SI es
@@ -73,16 +77,16 @@ log() {
 	fi
 	local timestamp
 	timestamp=$(date '+%Y-%m-%d %H:%M')
-	echo "[$timestamp] birdnet-lsd: $1" >> "$ruta_log"
-	echo "birdnet-lsd: $1"
+	echo "[$timestamp] TectorNET-Pi: $1" >> "$ruta_log"
+	echo "TectorNET-Pi: $1"
 }
 
 # Solo tiene sentido correr esto despues de una migracion ya completa --
-# antes de eso, migrar_a_birdnet_lsd.sh se encarga del clone inicial.
+# antes de eso, migrar_a_tectornet_pi.sh se encarga del clone inicial.
 [ -f "$MARCA_MIGRADO" ] || exit 0
-[ -d "$BIRDNET_LSD_DIR" ] || exit 0
+[ -d "$TECTORNET_PI_DIR" ] || exit 0
 
-cd "$BIRDNET_LSD_DIR" || exit 0
+cd "$TECTORNET_PI_DIR" || exit 0
 
 if [ -z "${_REEXEC:-}" ]; then
 	# --- Fase 1: detectar cambios, traerlos, re-ejecutar desde cero ---
@@ -115,13 +119,13 @@ if [ -z "${_REEXEC:-}" ]; then
 	git reset --hard "$SHA_REMOTO" --quiet
 
 	if [ "$NECESITA_REINSTALAR" = "1" ]; then
-		"$BIRDNET_LSD_DIR/venv/bin/pip" install -q -r "$BIRDNET_LSD_DIR/requirements.txt" 2>/dev/null
+		"$TECTORNET_PI_DIR/venv/bin/pip" install -q -r "$TECTORNET_PI_DIR/requirements.txt" 2>/dev/null
 	fi
 
 	# _REEXEC evita un bucle si por lo que sea el archivo siguiera
 	# "cambiando" -- de aca en mas, TODO lo que sigue se lee de una copia
 	# fresca y completa del archivo ya actualizado.
-	SHA_ANTERIOR="$SHA_ANTERIOR" _REEXEC=1 exec bash "$BIRDNET_LSD_DIR/scripts/actualizar_birdnet_lsd.sh"
+	SHA_ANTERIOR="$SHA_ANTERIOR" _REEXEC=1 exec bash "$TECTORNET_PI_DIR/scripts/actualizar_tectornet_pi.sh"
 fi
 
 # --- Fase 2: chequeo de salud + revert si hace falta (siempre corre
@@ -129,7 +133,7 @@ fi
 SHA_REMOTO=$(git rev-parse HEAD 2>/dev/null)
 
 chequear_salud() {
-	sudo systemctl restart birdnet-lsd.service
+	sudo systemctl restart TectorNET-Pi.service
 
 	# Espera con reintentos, no un "sleep 5" fijo -- encontrado en tector1
 	# el 29/08: con el clasificador viejo (BirdNET tflite, carga casi
@@ -154,14 +158,14 @@ chequear_salud() {
 	# margen real para ese escenario.
 	ok=0
 	for _ in $(seq 1 45); do
-		if systemctl is-active --quiet birdnet-lsd.service && pgrep -f "arecord -f S16_LE" > /dev/null; then
+		if systemctl is-active --quiet TectorNET-Pi.service && pgrep -f "arecord -f S16_LE" > /dev/null; then
 			ok=1
 			break
 		fi
 		sleep 1
 	done
 	if [ "$ok" != "1" ]; then
-		log "ALERTA: chequear_salud -- arecord no aparecio en 45s tras el restart (servicio activo=$(systemctl is-active birdnet-lsd.service 2>&1))"
+		log "ALERTA: chequear_salud -- arecord no aparecio en 45s tras el restart (servicio activo=$(systemctl is-active TectorNET-Pi.service 2>&1))"
 		return 1
 	fi
 
@@ -179,11 +183,11 @@ chequear_salud() {
 	# /root/.cache/huggingface, que en la practica tarda mas de 60s
 	# (confirmado en tector1 el 29/08: timeout real, exit code 124, sin
 	# ningun problema real de codigo de por medio). El servicio real
-	# (birdnet-lsd.service) corre como "lsd" (ver systemd/birdnet-lsd.service),
+	# (TectorNET-Pi.service) corre como "lsd" (ver systemd/TectorNET-Pi.service),
 	# asi que apuntamos al cache de ESE usuario para que este chequeo
 	# use el mismo cache ya poblado, sin importar que usuario lo invoque.
 	export HF_HOME=/home/lsd/.cache/huggingface
-	if ! timeout 90 "$BIRDNET_LSD_DIR/venv/bin/python3" "$BIRDNET_LSD_DIR/scripts/verificar_clasificador.py"; then
+	if ! timeout 90 "$TECTORNET_PI_DIR/venv/bin/python3" "$TECTORNET_PI_DIR/scripts/verificar_clasificador.py"; then
 		log "ALERTA: chequear_salud -- verificar_clasificador.py fallo o colgo (90s)"
 		return 1
 	fi

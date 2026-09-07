@@ -1,7 +1,9 @@
-# birdnet-lsd
+# TectorNET-Pi
 
 Motor de deteccion propio para el LSD-Tector, en reemplazo del loop de
-analisis de BirdNET-Pi.
+analisis de BirdNET-Pi. Renombrado el 7/9/2026 (nombre anterior:
+birdnet-lsd) -- el repo espejo historico `birdnet-lsd-v1`, mencionado
+mas abajo, conserva su nombre original a proposito.
 
 ## Cambio de modelo (29/08/2026)
 
@@ -141,8 +143,8 @@ README de LSD-Tector1.1).
 ## Instalacion
 
 ```bash
-git clone https://github.com/LSDArroyoGold/birdnet-lsd.git
-cd birdnet-lsd
+git clone https://github.com/LSDArroyoGold/TectorNET-Pi.git
+cd TectorNET-Pi
 bash instalar.sh
 ```
 
@@ -151,7 +153,7 @@ PyTorch). BirdSet ya viene commiteado en `modelo/` (no tiene host publico
 propio todavia); Perch2 se descarga solo del cache de HuggingFace la
 primera vez que corre. El propio `instalar.sh` verifica que el
 clasificador carga y clasifica de punta a punta al final (mismo chequeo
-que usa `scripts/actualizar_birdnet_lsd.sh` para decidir si un update
+que usa `scripts/actualizar_tectornet_pi.sh` para decidir si un update
 rompio algo).
 
 Completar `config/config_birdweather.txt` y `config/config_sincronizacion.txt`
@@ -161,8 +163,8 @@ Para que corra en segundo plano y sobreviva reinicios:
 
 ```bash
 bash instalar_servicio.sh
-sudo systemctl start birdnet-lsd.service
-journalctl -u birdnet-lsd.service -f
+sudo systemctl start TectorNET-Pi.service
+journalctl -u TectorNET-Pi.service -f
 ```
 
 ## Estructura
@@ -183,7 +185,7 @@ journalctl -u birdnet-lsd.service -f
 - `scripts/verificar_clasificador.py` -- smoke-test del clasificador real
   sobre `scripts/test_audio/muestra_salud.mp3` (audio real corto,
   commiteado). Usado por `instalar.sh` y por el chequeo de salud de
-  `actualizar_birdnet_lsd.sh` -- no valida precision, valida que el
+  `actualizar_tectornet_pi.sh` -- no valida precision, valida que el
   pipeline corre sin crashear ni colgarse.
 - `scripts/audio_io.py` -- escritura del audio del evento a mp3 (320kbps,
   sin lowpass) via `ffmpeg`.
@@ -193,7 +195,7 @@ journalctl -u birdnet-lsd.service -f
 - `scripts/birdweather.py` / `scripts/drive.py` -- POST a BirdWeather y
   subida a Drive de una deteccion, ambos event-driven (ver seccion de
   sincronizacion mas arriba).
-- `scripts/actualizar_birdnet_lsd.sh` -- git pull + reinstalar
+- `scripts/actualizar_tectornet_pi.sh` -- git pull + reinstalar
   dependencias si `requirements.txt` cambio + chequeo de salud real
   (`verificar_clasificador.py`, con timeout) + rollback automatico si
   algo rompio. Corre en cada ventana de amanecer/atardecer.
@@ -204,7 +206,7 @@ journalctl -u birdnet-lsd.service -f
   nombre cientifico directo, ALPHA=0.7).
 - `config/config_birdweather.txt.ejemplo` / `config/config_sincronizacion.txt.ejemplo`
   -- plantillas de datos especificos del dispositivo (no se commitean).
-- `systemd/birdnet-lsd.service` + `instalar_servicio.sh` -- arranque
+- `systemd/TectorNET-Pi.service` + `instalar_servicio.sh` -- arranque
   automatico y reinicio solo (`Restart=always`) si el proceso muere.
 - `modelo/` -- `birdset_efficientnetb1.onnx` (commiteado, 72MB, sin host
   publico propio todavia), `birdset_efficientnetb1_config.json`,

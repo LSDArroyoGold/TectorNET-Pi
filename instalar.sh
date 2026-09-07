@@ -1,5 +1,5 @@
 #!/bin/bash
-# instalar.sh - Motor de deteccion propio (birdnet-lsd), instalacion
+# instalar.sh - Motor de deteccion propio (TectorNET-Pi), instalacion
 # aislada: venv de Python dedicado. Modelo cambiado el 29/08/2026 --
 # BirdNET reentrenado (tflite, descargado de otro repo via
 # raw.githubusercontent.com) retirado por completo, reemplazado por

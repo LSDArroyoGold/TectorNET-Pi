@@ -66,7 +66,7 @@ from detector import SR, AcumuladorEventos, cargar_config, cargar_config_birdwea
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def _detectar_log_sistema_real():
-    """birdnet-lsd es un repo hermano independiente, compartido tal cual
+    """TectorNET-Pi es un repo hermano independiente, compartido tal cual
     entre tector1 (LSD-Tector1.1) y tector2 (LSD-Tector2.0) -- pero cada
     uno tiene su PROPIA convencion de ruta para el log_sistema.txt que de
     verdad se sube a Drive en cada ventana:
@@ -287,7 +287,7 @@ def main():
     hilo.start()
 
     print(
-        f"birdnet-lsd (TectorNet) arrancando (bloque={duracion_bloque_s}s, escala={config_det['ESCALA']}, "
+        f"TectorNET-Pi (TectorNet) arrancando (bloque={duracion_bloque_s}s, escala={config_det['ESCALA']}, "
         f"paso_ventana={config_det['PASO_VENTANA_S']}s, card={config_sync['REC_CARD']}, "
         f"canales={config_sync['CHANNELS']})",
         flush=True,

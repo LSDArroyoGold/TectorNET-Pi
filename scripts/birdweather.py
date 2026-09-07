@@ -54,7 +54,7 @@ def enviar_deteccion(config_bw, resultado, timestamp_inicio, audio, sr, timeout_
         'soundscapeEndTime': len(audio) / sr,
         'commonName': resultado['especie_comun'],
         'scientificName': especie_cientifica,
-        'algorithm': 'lsd-birdnet-lsd-v10',
+        'algorithm': 'lsd-tectornet-pi-v10',
         'confidence': resultado['confianza'],
     }
     resp_deteccion = requests.post(detection_url, json=payload, timeout=timeout_deteccion)

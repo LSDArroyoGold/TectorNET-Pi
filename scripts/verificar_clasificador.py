@@ -1,6 +1,6 @@
 """
 Smoke-test del clasificador real, usado por chequear_salud() en
-actualizar_birdnet_lsd.sh (ver ahi el porque: "el servicio esta activo y
+actualizar_tectornet_pi.sh (ver ahi el porque: "el servicio esta activo y
 arecord esta corriendo" no detecta un clasificador colgado o demasiado
 lento, que es exactamente el modo de falla nuevo que introduce
 TectorNet -- ver motor.py, docstring del modulo).

@@ -1,5 +1,5 @@
 #!/bin/bash
-# instalar_servicio.sh - registra birdnet-lsd como servicio systemd, para
+# instalar_servicio.sh - registra TectorNET-Pi como servicio systemd, para
 # que corra en segundo plano y se reinicie solo (Restart=always) si el
 # proceso muere o el dispositivo reinicia. Paso separado de instalar.sh
 # a proposito: instalar.sh se puede correr en cualquier maquina (para
@@ -7,7 +7,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
-UNIDAD="birdnet-lsd.service"
+UNIDAD="TectorNET-Pi.service"
 
 if [ ! -d "$SCRIPT_DIR/venv" ]; then
 	echo "No existe $SCRIPT_DIR/venv -- correr primero bash instalar.sh" >&2
@@ -23,7 +23,7 @@ sudo loginctl enable-linger lsd
 
 echo "==> Registrando $UNIDAD (BASE_PATH=$SCRIPT_DIR, UID_LSD=$UID_LSD)"
 sed -e "s|__BASE_PATH__|$SCRIPT_DIR|g" -e "s|__UID_LSD__|$UID_LSD|g" \
-	"$SCRIPT_DIR/systemd/birdnet-lsd.service" | sudo tee /etc/systemd/system/$UNIDAD > /dev/null
+	"$SCRIPT_DIR/systemd/TectorNET-Pi.service" | sudo tee /etc/systemd/system/$UNIDAD > /dev/null
 sudo chmod 644 /etc/systemd/system/$UNIDAD
 sudo systemctl daemon-reload
 sudo systemctl enable $UNIDAD
@@ -31,7 +31,7 @@ sudo systemctl enable $UNIDAD
 echo "==> Registrando rotacion de motor.log (semanal, 8 semanas, copytruncate --"
 echo "    el proceso mantiene el archivo abierto via el redirect de systemd, asi"
 echo "    que hace falta copiar+truncar en vez de mover+recrear)"
-sed "s|__BASE_PATH__|$SCRIPT_DIR|g" "$SCRIPT_DIR/systemd/motor.logrotate" | sudo tee /etc/logrotate.d/birdnet-lsd > /dev/null
+sed "s|__BASE_PATH__|$SCRIPT_DIR|g" "$SCRIPT_DIR/systemd/motor.logrotate" | sudo tee /etc/logrotate.d/TectorNET-Pi > /dev/null
 
 echo ""
 echo "==> Listo. Para arrancarlo ahora:"

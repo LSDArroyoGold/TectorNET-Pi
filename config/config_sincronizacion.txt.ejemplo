@@ -4,7 +4,7 @@
 #
 # DRIVE_PATH es el mismo valor que ya vive en config_general.txt de
 # LSD-Tector2.0 (variable DRIVE_PATH), o el que use el equivalente de
-# LSD-Tector1.1 -- se duplica aca porque birdnet-lsd es un repo aparte,
+# LSD-Tector1.1 -- se duplica aca porque TectorNET-Pi es un repo aparte,
 # sin acceso a esos otros config. DRIVE_SUBCARPETA es el nombre de la
 # carpeta de detecciones dentro de DRIVE_PATH (LSD-Tector2.0 usa
 # "Detecciones", LSD-Tector1.1 usa "BirdNET_Detecciones" -- cada

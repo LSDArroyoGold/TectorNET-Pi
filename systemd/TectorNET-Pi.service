@@ -1,5 +1,5 @@
 [Unit]
-Description=birdnet-lsd - motor de deteccion propio (grabacion + clasificacion + sincronizacion event-driven)
+Description=TectorNET-Pi - motor de deteccion propio (grabacion + clasificacion + sincronizacion event-driven)
 After=network-online.target sound.target
 Wants=network-online.target
 
