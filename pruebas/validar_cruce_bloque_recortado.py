@@ -44,7 +44,7 @@ BASE = os.path.expanduser('~/Desktop/Tector/Datasets_prueba/BirdNET_Detecciones'
 # (deteccion no posteada a BirdWeather) -- este dataset puntual
 # (BirdNET_Detecciones) es anterior a ese cambio y nunca lo tiene, pero
 # el regex queda preparado por si se apunta a un dataset mas nuevo.
-patron = re.compile(r'^(.+)-(\d+)-(\d{4}-\d{2}-\d{2})-birdnet-(\d{2})[_:](\d{2})[_:](\d{2})(?:-nbw)?\.mp3$')
+patron = re.compile(r'^(.+)-(\d+)-(\d{4}-\d{2}-\d{2})-(?:birdnet|tectornet)-(\d{2})[_:](\d{2})[_:](\d{2})(?:-nbw)?\.mp3$')
 
 def parsear(path):
     m = patron.match(os.path.basename(path))
