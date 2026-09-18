@@ -1,4 +1,5 @@
 __BASE_PATH__/motor.log {
+	su lsd lsd
 	weekly
 	rotate 8
 	compress
