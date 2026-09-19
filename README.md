@@ -75,7 +75,7 @@ En vez de clasificar cada ventana fija de forma aislada, el flujo es:
    `stock_regional_meta.json`) al logit crudo de cada especie antes del
    sigmoide, por nombre cientifico -- aplica igual a la neurona
    reentrenada y a la original.
-5. **v10 podado** (`modelo/v10_podado.json`): 4 de las 14 neuronas
+5. **v10 podado** (`modelo/v10_podado.json` del repo de reentreno `LSDTector-BirdNET-retrain-bsas`; este motor no lo lee): 4 de las 14 neuronas
    reentrenadas de v10 mostraron sobreajuste al audio de campo (buen
    recall en campo, caida real en Xeno-canto externo, ver validacion mas
    abajo) -- para esas 4 especies se suprime la neurona reentrenada
@@ -99,7 +99,7 @@ Motor completo (acumulador + ventanas solapadas + confianza_racha + sesgo
   resultados consistentes en ambos datasets para las 10 especies
   mantenidas reentrenadas; las 4 podadas mostraron mejora real en campo
   pero caida en Xeno-canto, señal de sobreajuste al sitio especifico (ver
-  motivo detallado por especie en `modelo/v10_podado.json`).
+  motivo detallado por especie en `modelo/v10_podado.json` del repo de reentreno).
 
 ## Sincronizacion (BirdWeather + servidor, event-driven)
 
