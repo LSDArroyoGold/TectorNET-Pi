@@ -1,37 +1,22 @@
 #!/bin/bash
 #
-# actualizar_tectornet_pi.sh - Actualiza el checkout de TectorNET-Pi ya
-# migrado (git pull) y reinicia el servicio si hubo cambios, pensado
-# para correr en cada ventana (amanecer/atardecer) de un dispositivo en
-# el campo sin acceso SSH mientras corre.
+# actualizar_tectornet_pi.sh - Actualiza el checkout de TectorNET-Pi desde
+# el servidor Tector (git fetch de la rama `stable`) y reinicia el servicio
+# si hubo cambios. Pensado para correr en cada ventana (amanecer/atardecer)
+# de un dispositivo en el campo sin acceso SSH mientras corre, y por cron
+# en Tector Mini.
 #
-# Por que existe: migrar_a_tectornet_pi.sh (el clone + instalacion inicial)
-# solo corre mientras no exista /home/lsd/.tectornet_pi_migrado -- una vez
-# migrado, ese bloque entero se salta para siempre en inicio_amanecer.sh/
-# inicio_atardecer.sh, y con el se salteaba tambien cualquier chance de
-# bajar cambios nuevos. Encontrado el 26/08: dos fixes reales (CONFIDENCE
-# 0.6->0.5, formato de hora en el nombre de archivo) quedaron pusheados
-# en GitHub sin ninguna forma de llegar a tector1.
+# Principio rector: NUNCA dejar al dispositivo sin motor de deteccion sano.
+# Si el cambio rompe el servicio (no queda activo, o arecord no arranca, o
+# el clasificador no clasifica), se revierte solo al commit anterior (que
+# ya se sabia sano) y se reintenta -- nunca se deja el cambio nuevo
+# aplicado si no paso el chequeo de salud.
 #
-# Mismo principio rector que migrar_a_tectornet_pi.sh: NUNCA dejar al
-# dispositivo sin motor de deteccion sano. Si el pull trae un cambio que
-# rompe el servicio (no queda activo, o arecord no arranca, o el
-# clasificador no clasifica), se revierte solo al commit anterior (que ya
-# se sabia sano) y se reintenta -- nunca se deja el pull nuevo aplicado
-# si no paso el chequeo de salud.
-#
-# Verificado en campo en tector1 el 29/08/2026: el mecanismo de re-exec
-# (ver "Fase 1"/"Fase 2" mas abajo) no protege la transicion desde una
-# version del script ANTERIOR a que este mismo mecanismo existiera (esa
-# version vieja no sabe re-ejecutarse, es un limite de arranque inherente
-# a cualquier fix que un script se aplique a si mismo) -- pero a partir de
-# esta version en adelante, cada actualizacion futura si pasa por el
-# re-exec correctamente. Este comentario es, de hecho, el primer cambio
-# real usado para confirmarlo end-to-end en tector1.
-#
-# 7/9/2026: script (y repo) renombrado de birdnet-lsd a TectorNET-Pi --
-# ver migrar_a_tectornet_pi.sh para el mecanismo que renombra en el lugar
-# una instalacion vieja ya corriendo bajo el nombre anterior.
+# El mecanismo de re-exec (ver "Fase 1"/"Fase 2" mas abajo) hace que una
+# version nueva de este script se ejecute a si misma antes de aplicar el
+# resto; no protege la transicion desde una version anterior a que ese
+# mecanismo existiera (limite de arranque inherente a cualquier fix que un
+# script se aplica a si mismo).
 
 set -uo pipefail
 
@@ -51,12 +36,12 @@ log() {
 	# evento "MSG" generico, asi que la llamada anterior siempre caia en la
 	# rama 'else' (fin_esperado = sys.argv[3]) y explotaba con IndexError al
 	# recibir solo 2 argumentos. En la practica, las alertas de este script
-	# nunca habian llegado al log real ni a Drive, solo al stdout de la
+	# nunca habian llegado al log real ni al servidor, solo al stdout de la
 	# corrida (visible si alguien la mira en vivo, invisible en campo).
 	#
 	# Fix: escribir directo a log_sistema.txt (el archivo real, sin pasar
 	# por ese script ni tocar hardware de PiJuice) -- mismo archivo que
-	# inicio_amanecer.sh/inicio_atardecer.sh ya suben a Drive con rclone en
+	# inicio_amanecer.sh/inicio_atardecer.sh ya suben al servidor con rclone en
 	# cada ventana, asi que las alertas quedan visibles sin agregar ningun
 	# mecanismo de sincronizacion nuevo.
 	#
@@ -86,14 +71,13 @@ log() {
 	echo "TectorNET-Pi: $1"
 }
 
-# Solo tiene sentido correr esto despues de una migracion ya completa --
-# antes de eso, migrar_a_tectornet_pi.sh se encarga del clone inicial.
+# Solo tiene sentido despues de la instalacion inicial (instalar.sh + marca).
 [ -f "$MARCA_MIGRADO" ] || exit 0
 [ -d "$TECTORNET_PI_DIR" ] || exit 0
 
 cd "$TECTORNET_PI_DIR" || exit 0
 
-# Idempotente: migra solo a los checkouts que todavia apuntaban a GitHub.
+# Idempotente: fija el origen al servidor (por si el checkout vino de otro lado).
 git remote set-url origin "$SERVIDOR_GIT"
 
 if [ -z "${_REEXEC:-}" ]; then

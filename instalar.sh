@@ -1,8 +1,7 @@
 #!/bin/bash
 # instalar.sh - Motor de deteccion propio (TectorNET-Pi), instalacion
 # aislada: venv de Python dedicado. Modelo cambiado el 29/08/2026 --
-# BirdNET reentrenado (tflite, descargado de otro repo via
-# raw.githubusercontent.com) retirado por completo, reemplazado por
+# BirdNET reentrenado (tflite) retirado por completo, reemplazado por
 # TectorNet: Perch 2.0 ONNX + BirdSet EfficientNetB1 ONNX. BirdSet ya
 # viene commiteado en este mismo repo (modelo/birdset_efficientnetb1.onnx,
 # no tiene host publico propio todavia); Perch2 se descarga solo, la

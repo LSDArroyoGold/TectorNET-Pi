@@ -9,9 +9,9 @@
 # carpeta de detecciones dentro de DRIVE_PATH (LSD-Tector2.0 usa
 # "Detecciones", LSD-Tector1.1 usa "BirdNET_Detecciones" -- cada
 # dispositivo mantiene el nombre que ya usaba, para no partir su
-# historial en dos lugares distintos de Drive).
+# historial en dos lugares distintos del servidor).
 RCLONE_CONFIG = /home/lsd/.config/rclone/rclone.conf
-DRIVE_REMOTE = gdrive
+DRIVE_REMOTE = servidor
 DRIVE_PATH =
 DRIVE_SUBCARPETA = Detecciones
 AUDIO_ROOT = /home/lsd/BirdSongs/Extracted

@@ -101,12 +101,12 @@ Motor completo (acumulador + ventanas solapadas + confianza_racha + sesgo
   pero caida en Xeno-canto, señal de sobreajuste al sitio especifico (ver
   motivo detallado por especie en `modelo/v10_podado.json`).
 
-## Sincronizacion (BirdWeather + Drive, event-driven)
+## Sincronizacion (BirdWeather + servidor, event-driven)
 
-Ni BirdWeather ni Drive se sincronizan por ciclo periodico -- las dos
+Ni BirdWeather ni el servidor se sincronizan por ciclo periodico -- las dos
 subidas pasan a ser parte de la misma cadena de eventos que dispara cada
 deteccion, en `scripts/motor.py`: clasificar -> guardar mp3 -> avisar a
-BirdWeather -> subir a Drive, en ese orden, apenas se cierra el evento.
+BirdWeather -> subir al servidor, en ese orden, apenas se cierra el evento.
 No hay que esperar a que un cron corra de nuevo ni a que termine la
 ventana de grabacion.
 
@@ -120,20 +120,19 @@ Esto reemplaza dos mecanismos periodicos anteriores:
 
 `scripts/drive.py` sube un solo archivo por vez (`rclone copyto`, no un
 barrido del arbol entero) al mismo destino que ya usan esos scripts
-(`gdrive:$DRIVE_PATH/Detecciones/<fecha>/<especie>/...` -- sin "By_Date",
+(`<DRIVE_REMOTE>:<DRIVE_PATH>/Detecciones/<fecha>/<especie>/...` -- sin "By_Date",
 que es una carpeta puramente local: `rclone copy .../By_Date/ destino`
 copia el contenido de esa carpeta, no la carpeta en si, asi que nunca
-llegaba a Drive), asi que si algun barrido periodico viejo sigue
+llegaba al servidor), asi que si algun barrido periodico viejo sigue
 corriendo por fuera no rompe nada -- encuentra el archivo ya arriba y no
 hace nada de mas (`rclone copy` es idempotente).
 Mismo timeout defensivo de 90s que el resto de las llamadas a rclone del
-proyecto, por la cuota compartida de Google (ver nota al respecto en el
-README de LSD-Tector1.1).
+proyecto: si el servidor no responde, falla rapido en vez de colgar la ventana.
 
 ## Que falta (no incluido todavia)
 
 - Nada del loop de deteccion en si -- motor, exportacion, BirdWeather y
-  Drive ya estan integrados end-to-end en `scripts/motor.py`.
+  subida al servidor ya estan integrados end-to-end en `scripts/motor.py`.
 - Rotacion/limpieza de `motor.log` (hoy crece sin limite -- si el
   dispositivo corre meses seguidos conviene sumar logrotate).
 - Sacar el barrido periodico redundante de LSD-Tector1.1/2.0 una vez que
@@ -143,7 +142,8 @@ README de LSD-Tector1.1).
 ## Instalacion
 
 ```bash
-git clone https://github.com/LSDArroyoGold/TectorNET-Pi.git
+# desde el servidor Tector (rama stable); requiere la clave del dispositivo
+git clone -b stable tectorgit@100.83.125.103:tectornet-pi.git TectorNET-Pi
 cd TectorNET-Pi
 bash instalar.sh
 ```
@@ -193,7 +193,7 @@ journalctl -u TectorNET-Pi.service -f
   que BirdNET-Pi (`extract_detection()`), para que el resto del sistema
   que ya cuenta/parsea detecciones siga funcionando sin tocar nada.
 - `scripts/birdweather.py` / `scripts/drive.py` -- POST a BirdWeather y
-  subida a Drive de una deteccion, ambos event-driven (ver seccion de
+  subida al servidor de una deteccion, ambos event-driven (ver seccion de
   sincronizacion mas arriba).
 - `scripts/actualizar_tectornet_pi.sh` -- git pull + reinstalar
   dependencias si `requirements.txt` cambio + chequeo de salud real
