@@ -36,6 +36,11 @@
 set -uo pipefail
 
 TECTORNET_PI_DIR="/home/lsd/TectorNET-Pi"
+
+# El motor se baja del servidor Tector (rama `stable`, espejo de GitHub
+# validado con bash -n / py_compile), nunca de GitHub directamente.
+SERVIDOR_GIT="tectorgit@100.83.125.103:tectornet-pi.git"
+export GIT_SSH_COMMAND="ssh -i /home/lsd/.ssh/id_ed25519_servidor -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15"
 MARCA_MIGRADO="/home/lsd/.tectornet_pi_migrado"
 
 log() {
@@ -88,6 +93,9 @@ log() {
 
 cd "$TECTORNET_PI_DIR" || exit 0
 
+# Idempotente: migra solo a los checkouts que todavia apuntaban a GitHub.
+git remote set-url origin "$SERVIDOR_GIT"
+
 if [ -z "${_REEXEC:-}" ]; then
 	# --- Fase 1: detectar cambios, traerlos, re-ejecutar desde cero ---
 	#
@@ -104,9 +112,9 @@ if [ -z "${_REEXEC:-}" ]; then
 	# (`exec`) una vez que el archivo en disco ya es estable y completo.
 	SHA_ANTERIOR=$(git rev-parse HEAD 2>/dev/null) || exit 0
 
-	git fetch --quiet origin main || { log "ALERTA: git fetch fallo, sigue con la version actual"; exit 0; }
+	timeout 120 git fetch --quiet origin +refs/heads/stable:refs/remotes/origin/stable || { log "ALERTA: git fetch fallo, sigue con la version actual"; exit 0; }
 
-	SHA_REMOTO=$(git rev-parse origin/main 2>/dev/null)
+	SHA_REMOTO=$(git rev-parse origin/stable 2>/dev/null)
 	if [ -z "$SHA_REMOTO" ] || [ "$SHA_REMOTO" = "$SHA_ANTERIOR" ]; then
 		exit 0  # sin cambios, nada que hacer
 	fi
