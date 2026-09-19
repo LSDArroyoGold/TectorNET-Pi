@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 config/config_birdweather.txt
 config/config_sincronizacion.txt
+motor.log
